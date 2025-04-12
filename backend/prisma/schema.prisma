@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Course {
+  id         Int      @id @default(autoincrement())
+  courseName String   @map("course_name")
+  professor  String?
+  startDate  DateTime @default(now()) @map("start_date")
+  endDate    DateTime @map("end_date")
+
+  assignments Assignment[]
+
+  @@map("courses")
+}
+
+model Assignment {
+  id       Int              @id @default(autoincrement())
+  courseId Int              @map("course_id")
+  title    String
+  dueDate  DateTime         @map("due_date")
+  status   AssignmentStatus @default(pending)
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@map("assignments")
+}
+
+enum AssignmentStatus {
+  pending
+  completed
+}
