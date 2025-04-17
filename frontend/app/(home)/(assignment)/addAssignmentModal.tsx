@@ -1,11 +1,18 @@
 import React, { useState } from "react";
-import { Text, TextInput, View, Button, SafeAreaView } from "react-native";
+import {
+  Text,
+  TextInput,
+  View,
+  Button,
+  SafeAreaView,
+  StyleSheet,
+} from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import axios from "axios";
 import { api } from "@/constants/api";
 
 const AddAssignmentModal = () => {
-  const { id } = useLocalSearchParams(); // courseId from params
+  const { id } = useLocalSearchParams();
   const router = useRouter();
 
   const [title, setTitle] = useState("");
@@ -24,8 +31,9 @@ const AddAssignmentModal = () => {
     };
 
     try {
+      // Note: Ensure 'api' constant includes the correct base URL (e.g., http://10.0.2.2:3000)
       await axios.post(`${api}/api/assignments/${id}`, newAssignment);
-      router.back(); // Navigate back on success
+      router.back();
     } catch (err) {
       console.error("Error adding assignment:", err);
       setError("Failed to add assignment. Please try again.");
@@ -33,19 +41,19 @@ const AddAssignmentModal = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 justify-center items-center p-4 bg-white">
-      <Text className="text-2xl font-bold mb-4">Add Assignment</Text>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.header}>Add Assignment</Text>
 
-      {error && <Text className="text-red-500 mb-2">{error}</Text>}
+      {error && <Text style={styles.errorText}>{error}</Text>}
 
       <TextInput
-        className="border border-gray-400 rounded-md p-2 mb-4 w-full"
+        style={styles.input}
         placeholder="Assignment Title"
         value={title}
         onChangeText={setTitle}
       />
       <TextInput
-        className="border border-gray-400 rounded-md p-2 mb-4 w-full"
+        style={styles.input}
         placeholder="Due Date (YYYY-MM-DD)"
         value={dueDate}
         onChangeText={setDueDate}
@@ -55,5 +63,32 @@ const AddAssignmentModal = () => {
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 16,
+    backgroundColor: "#ffffff",
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 16,
+  },
+  errorText: {
+    color: "#ef4444",
+    marginBottom: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#9ca3af",
+    borderRadius: 6,
+    padding: 8,
+    marginBottom: 16,
+    width: "100%",
+  },
+});
 
 export default AddAssignmentModal;

@@ -1,6 +1,6 @@
 import { Link, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
-import { View, Text, Pressable, Switch } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, Pressable, Switch, StyleSheet } from "react-native";
 import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
@@ -13,8 +13,9 @@ export default function AssignmentScreen() {
   useEffect(() => {
     const fetchAssignments = async () => {
       try {
+        // NOTE: Replace 'localhost' with '10.0.2.2' for Android emulator
         const res = await axios.get(
-          `http://localhost:3000/api/assignments/${id}`
+          `http://10.0.2.2:3000/api/assignments/${id}`
         );
         setAssignments(res.data.assignment);
       } catch (err) {
@@ -28,8 +29,9 @@ export default function AssignmentScreen() {
   const toggleStatus = async (assignmentId: number, currentStatus: string) => {
     const newStatus = currentStatus === "completed" ? "pending" : "completed";
     try {
+      // NOTE: Replace 'localhost' with '10.0.2.2' for Android emulator
       await axios.put(
-        `http://localhost:3000/api/assignments/${id}/${assignmentId}`
+        `http://10.0.2.2:3000/api/assignments/${id}/${assignmentId}`
       );
       setAssignments((prev) =>
         prev.map((a) =>
@@ -43,8 +45,9 @@ export default function AssignmentScreen() {
 
   const handleDelete = async (assignmentId: number) => {
     try {
+      // NOTE: Replace 'localhost' with '10.0.2.2' for Android emulator
       await axios.delete(
-        `http://localhost:3000/api/assignments/${id}/${assignmentId}`
+        `http://10.0.2.2:3000/api/assignments/${id}/${assignmentId}`
       );
       setAssignments((prev) => prev.filter((a) => a.id !== assignmentId));
     } catch (err) {
@@ -53,26 +56,23 @@ export default function AssignmentScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 p-4 relative">
+    <SafeAreaView style={styles.safeArea}>
       {assignments.length === 0 ? (
-        <Text className="text-gray-500">No assignments found.</Text>
+        <Text style={styles.emptyText}>No assignments found.</Text>
       ) : (
         assignments.map((assignment) => (
-          <View
-            key={assignment.id}
-            className="flex-row justify-between items-center border p-3 rounded-lg mb-3"
-          >
-            <View className="flex-1">
+          <View key={assignment.id} style={styles.listItemContainer}>
+            <View style={styles.listItemTextContainer}>
               <Text
-                className={`text-lg font-semibold ${
-                  assignment.status === "completed"
-                    ? "line-through text-gray-400"
-                    : ""
-                }`}
+                style={[
+                  styles.assignmentTitle,
+                  assignment.status === "completed" &&
+                    styles.assignmentTitleCompleted,
+                ]}
               >
                 {assignment.title}
               </Text>
-              <Text className="text-sm text-gray-500">
+              <Text style={styles.dueDateText}>
                 Due: {format(new Date(assignment.dueDate), "MMM dd, yyyy")}
               </Text>
             </View>
@@ -86,7 +86,7 @@ export default function AssignmentScreen() {
 
             <Pressable
               onPress={() => handleDelete(assignment.id)}
-              className="ml-3"
+              style={styles.deleteButton}
             >
               <Ionicons name="trash-outline" size={22} color="red" />
             </Pressable>
@@ -97,12 +97,70 @@ export default function AssignmentScreen() {
       <Link
         href={{
           pathname: "/addAssignmentModal",
-          params: { id: id },
+          params: { id: id as string }, // Ensure id is passed as string if needed
         }}
-        className="absolute bottom-6 right-6 bg-blue-600 w-14 h-14 rounded-full items-center justify-center shadow-lg z-50"
+        style={styles.floatingButton}
       >
         <Ionicons name="add" size={30} color="white" />
       </Link>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    padding: 16,
+    position: "relative",
+  },
+  emptyText: {
+    color: "#6b7280",
+  },
+  listItemContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#e5e7eb", // border-gray-200 equivalent
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  listItemTextContainer: {
+    flex: 1,
+    marginRight: 8, // Add some space before the switch/button
+  },
+  assignmentTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#111827", // Default text color
+  },
+  assignmentTitleCompleted: {
+    textDecorationLine: "line-through",
+    color: "#9ca3af", // text-gray-400
+  },
+  dueDateText: {
+    fontSize: 14,
+    color: "#6b7280", // text-gray-500
+  },
+  deleteButton: {
+    marginLeft: 12,
+  },
+  floatingButton: {
+    position: "absolute",
+    bottom: 24,
+    right: 24,
+    backgroundColor: "#2563eb",
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
+    zIndex: 50,
+  },
+});

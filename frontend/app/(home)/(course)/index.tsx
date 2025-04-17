@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TouchableOpacity, Alert, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlashList } from "@shopify/flash-list";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -43,30 +43,18 @@ const CourseScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white relative">
-      <Text className="pl-4 mt-3 text-2xl font-bold text-blue-600">
-        Courses
-      </Text>
-      <View className="border-t border-gray-300 my-3" />
+    <SafeAreaView style={styles.safeArea}>
+      <Text style={[styles.headerText]}>Courses</Text>
+      <View style={styles.divider} />
 
       <FlashList
         data={courses}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({
-          item,
-        }: {
-          item: {
-            id: number;
-            courseName: string;
-            professor?: string;
-            startDate: string;
-            endDate: string;
-          };
-        }) => (
-          <View className="bg-gray-100 mx-4 mb-3 p-4 rounded-xl shadow-sm flex-row justify-between items-start">
-            <View className="flex-1">
+        renderItem={({ item }) => (
+          <View style={styles.listItemContainer}>
+            <View style={styles.listItemTextContainer}>
               <Text
-                className="text-lg font-semibold text-gray-900"
+                style={styles.courseNameText}
                 onPress={() => {
                   router.push(`/(home)/(assignment)/${item.id}`);
                 }}
@@ -74,17 +62,17 @@ const CourseScreen = () => {
                 {item.courseName}
               </Text>
               {item.professor && (
-                <Text className="text-sm text-gray-600 mt-1">
+                <Text style={styles.detailsText}>
                   Professor: {item.professor}
                 </Text>
               )}
-              <Text className="text-sm text-gray-600 mt-1">
-                {format(new Date(item.startDate), "dd MMM yyyy")} →
+              <Text style={styles.detailsText}>
+                {format(new Date(item.startDate), "dd MMM yyyy")} →{" "}
                 {format(new Date(item.endDate), "dd MMM yyyy")}
               </Text>
             </View>
 
-            <View className="flex-row space-x-3">
+            <View style={styles.listItemButtonContainer}>
               <TouchableOpacity onPress={() => handleDelete(item.id)}>
                 <Ionicons name="trash-outline" size={20} color="red" />
               </TouchableOpacity>
@@ -93,23 +81,99 @@ const CourseScreen = () => {
         )}
         estimatedItemSize={80}
         ListEmptyComponent={
-          <View className="items-center justify-center mt-20">
-            <Text className="text-gray-400">
+          <View style={styles.emptyListComponent}>
+            <Text style={styles.emptyListText}>
               Courses list is empty. Add a course!
             </Text>
           </View>
         }
       />
 
-      {/* Floating + Button */}
-      <Link
-        href="/addCourseModal"
-        className="absolute  bottom-6 right-6 bg-blue-600 w-14 h-14 rounded-full items-center justify-center shadow-lg z-50"
-      >
-        <Ionicons name="add" size={30} color="white" className="m-3  top-3" />
+      <Link href="/addCourseModal" style={styles.floatingButton}>
+        <Ionicons style={{ top: 15 }} name="add" size={30} color="white" />
       </Link>
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+    position: "relative",
+  },
+  headerText: {
+    paddingLeft: 16,
+    marginTop: 12,
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#2563eb",
+  },
+  divider: {
+    borderTopWidth: 1,
+    borderTopColor: "#d1d5db",
+    marginVertical: 12,
+  },
+  listItemContainer: {
+    backgroundColor: "#f3f4f6",
+    marginHorizontal: 16,
+    marginBottom: 12,
+    padding: 16,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.18,
+    shadowRadius: 1.0,
+    elevation: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  listItemTextContainer: {
+    flex: 1,
+  },
+  courseNameText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#111827",
+  },
+  detailsText: {
+    fontSize: 14,
+    color: "#4b5563",
+    marginTop: 4,
+  },
+  listItemButtonContainer: {
+    flexDirection: "row",
+    // Add paddingLeft here if space-x-3 effect is needed for multiple buttons
+    // paddingLeft: 12,
+  },
+  emptyListComponent: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 80,
+  },
+  emptyListText: {
+    color: "#9ca3af",
+  },
+  floatingButton: {
+    position: "absolute",
+    paddingTop: 10,
+    paddingLeft: 10,
+    bottom: 24,
+    right: 24,
+    backgroundColor: "#2563eb",
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
+    zIndex: 50, // Note: zIndex behavior can vary
+  },
+});
 
 export default CourseScreen;

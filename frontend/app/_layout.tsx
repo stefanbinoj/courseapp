@@ -1,6 +1,7 @@
 import "./global.css";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { Text } from "react-native";
 
 export default function RootLayout() {
   return (
@@ -20,17 +21,24 @@ export default function RootLayout() {
 
           return <Ionicons name={iconName as any} size={size} color={color} />;
         },
-        tabBarLabel: () => {
+        tabBarLabel: ({ color, focused }) => {
+          // Accept standard props
+          let labelName;
           switch (route.name) {
             case "(home)":
-              return "Courses";
+              labelName = "Courses";
+              break; // Use break for clarity or just return directly
             case "(profile)":
-              return "Profile";
+              labelName = "Profile";
+              break;
             case "(settings)":
-              return "Settings";
+              labelName = "Settings";
+              break;
             default:
-              return route.name;
+              labelName = route.name; // Keep the default fallback
           }
+
+          return <Text style={{ color: color }}>{labelName}</Text>;
         },
         tabBarActiveTintColor: "#1e40af",
         tabBarInactiveTintColor: "#94a3b8",
