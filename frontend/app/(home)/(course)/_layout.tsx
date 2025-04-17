@@ -19,6 +19,7 @@ export default function RootLayout() {
           title: "Add Course",
           headerShown: true,
           presentation: "modal",
+          animation: "slide_from_bottom",
           headerLeft: () => (
             <Pressable
               onPress={() => router.back()}
